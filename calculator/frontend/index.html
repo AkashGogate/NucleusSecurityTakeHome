@@ -1,0 +1,82 @@
+<!-- AESTHETIC: NEON NOIR — deep void-black, neon green terminal display (VT323 pixel font),
+     magenta operator keys, amber digit keys, CRT scanlines, animated particle background,
+     film grain overlay. Feel: salvaged arcade cabinet rewired for a cyberpunk street corner.
+     frontend-design plugin active (auto-applies). vtsls absent → main.js reviewed manually. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEON CALC // NUCLEUS SX-7800</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <main class="calculator" role="main" aria-label="Neon Noir Calculator">
+
+    <header class="calc-header" aria-hidden="true">
+      <span class="brand">NUCLEUS</span>
+      <span class="model">SX-7800</span>
+      <span class="indicator" title="Power LED"></span>
+    </header>
+
+    <section class="display-panel" aria-label="Calculator display" aria-live="polite">
+      <div class="scanlines" aria-hidden="true"></div>
+      <div class="display-expression" id="expression" role="status" aria-label="Current expression">0</div>
+      <div class="display-result"     id="result"     role="status" aria-label="Result"></div>
+    </section>
+
+    <!-- Button layout per spec:
+         Row 1: 7  8  9  ÷
+         Row 2: 4  5  6  ×
+         Row 3: 1  2  3  −
+         Row 4: 0  .  =  +
+         Row 5: C  ⌫  xʸ  %  -->
+    <section class="keypad" role="group" aria-label="Calculator keypad">
+
+      <!-- Row 1 -->
+      <button class="btn btn-num" data-action="digit"    data-value="7"  aria-label="7">7</button>
+      <button class="btn btn-num" data-action="digit"    data-value="8"  aria-label="8">8</button>
+      <button class="btn btn-num" data-action="digit"    data-value="9"  aria-label="9">9</button>
+      <button class="btn btn-op"  data-action="operator" data-value="/"  aria-label="Divide">÷</button>
+
+      <!-- Row 2 -->
+      <button class="btn btn-num" data-action="digit"    data-value="4"  aria-label="4">4</button>
+      <button class="btn btn-num" data-action="digit"    data-value="5"  aria-label="5">5</button>
+      <button class="btn btn-num" data-action="digit"    data-value="6"  aria-label="6">6</button>
+      <button class="btn btn-op"  data-action="operator" data-value="*"  aria-label="Multiply">×</button>
+
+      <!-- Row 3 -->
+      <button class="btn btn-num" data-action="digit"    data-value="1"  aria-label="1">1</button>
+      <button class="btn btn-num" data-action="digit"    data-value="2"  aria-label="2">2</button>
+      <button class="btn btn-num" data-action="digit"    data-value="3"  aria-label="3">3</button>
+      <button class="btn btn-op"  data-action="operator" data-value="-"  aria-label="Subtract">−</button>
+
+      <!-- Row 4 -->
+      <button class="btn btn-num" data-action="digit"    data-value="0"  aria-label="0">0</button>
+      <button class="btn btn-num" data-action="digit"    data-value="."  aria-label="Decimal point">.</button>
+      <button class="btn btn-eq"  data-action="equals"                   aria-label="Equals">=</button>
+      <button class="btn btn-op"  data-action="operator" data-value="+"  aria-label="Add">+</button>
+
+      <!-- Row 5 -->
+      <button class="btn btn-fn"  data-action="clear"                    aria-label="Clear">C</button>
+      <button class="btn btn-fn"  data-action="backspace"                aria-label="Backspace">⌫</button>
+      <button class="btn btn-op"  data-action="operator" data-value="**" aria-label="Power (x to the y)">x<sup>y</sup></button>
+      <button class="btn btn-op"  data-action="operator" data-value="%"  aria-label="Modulo">%</button>
+
+    </section>
+
+    <footer class="calc-footer" aria-hidden="true">
+      <span class="status-label" id="status">READY</span>
+      <span class="backend-label">SRC: <span id="backend-status">···</span></span>
+    </footer>
+
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>

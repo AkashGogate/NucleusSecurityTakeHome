@@ -1,0 +1,435 @@
+/* ============================================================
+   NEON NOIR — Full CSS Custom Property System
+   ============================================================ */
+:root {
+  /* ── Palette ── */
+  --void:           #060810;
+  --void-mid:       #0d1020;
+  --void-panel:     #111425;
+  --void-border:    #1e2340;
+
+  /* ── Neon accents ── */
+  --neon-green:     #00ff88;
+  --neon-mag:       #ff006e;
+  --neon-amber:     #ffb347;
+  --neon-cyan:      #00d4ff;
+
+  /* ── Glow shadows ── */
+  --glow-green:     0 0 8px #00ff88aa, 0 0 20px #00ff8844, 0 0 40px #00ff8822;
+  --glow-mag:       0 0 8px #ff006eaa, 0 0 20px #ff006e44, 0 0 40px #ff006e22;
+  --glow-amber:     0 0 8px #ffb347aa, 0 0 20px #ffb34744;
+  --glow-eq:        0 0 12px #00ff88cc, 0 0 30px #00ff8866, 0 0 60px #00ff8833;
+
+  /* ── Typography ── */
+  --font-display:   'VT323', monospace;
+  --font-ui:        'Rajdhani', sans-serif;
+
+  /* ── Spacing / radii ── */
+  --space-xs:       4px;
+  --space-sm:       8px;
+  --space-md:       12px;
+  --space-lg:       16px;
+  --radius-sm:      4px;
+  --radius-md:      6px;
+  --radius-lg:      12px;
+
+  /* ── Button ── */
+  --btn-h:          64px;
+  --btn-font:       18px;
+
+  /* ── Motion ── */
+  --dur-fast:       80ms;
+  --dur-med:        200ms;
+  --ease-snap:      cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================
+   Reset
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background: var(--void);
+  color: var(--neon-green);
+  font-family: var(--font-ui);
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ============================================================
+   Background canvas — particles + noise grain
+   ============================================================ */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+}
+
+/* ============================================================
+   Calculator shell
+   ============================================================ */
+.calculator {
+  position: relative;
+  z-index: 10;
+  width: min(368px, 96vw);
+  background: linear-gradient(160deg, #131726 0%, #0a0d18 55%, #080b14 100%);
+  border: 1px solid var(--void-border);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 0 0 1px #ffffff06,
+    0 30px 80px #000000cc,
+    0 0 60px #00ff881a,
+    inset 0 1px 0 #ffffff10;
+  overflow: hidden;
+  animation: calc-appear 0.55s var(--ease-snap) both;
+}
+
+@keyframes calc-appear {
+  from { opacity: 0; transform: translateY(28px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* ============================================================
+   Header
+   ============================================================ */
+.calc-header {
+  display: flex;
+  align-items: center;
+  padding: 10px var(--space-lg) 8px;
+  border-bottom: 1px solid var(--void-border);
+  gap: var(--space-sm);
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: var(--neon-green);
+  text-shadow: var(--glow-green);
+  opacity: 0.9;
+}
+
+.model {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: #ffffff28;
+  margin-left: var(--space-xs);
+}
+
+.indicator {
+  margin-left: auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--neon-green);
+  box-shadow: var(--glow-green);
+  animation: led-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes led-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+/* ============================================================
+   Display panel
+   ============================================================ */
+.display-panel {
+  position: relative;
+  margin: var(--space-md) var(--space-md) 0;
+  background: #01080f;
+  border: 1px solid #00ff8822;
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg) var(--space-sm);
+  min-height: 102px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 30px #00000088,
+    0 0 0 1px #00ff8810;
+}
+
+/* CRT scanlines overlay */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    #00000028 3px,
+    #00000028 4px
+  );
+  pointer-events: none;
+  z-index: 2;
+  border-radius: var(--radius-md);
+}
+
+.display-expression {
+  position: relative;
+  z-index: 3;
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1.1;
+  color: #00ff8888;
+  text-align: right;
+  min-height: 32px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.04em;
+  transition: color var(--dur-med);
+}
+
+.display-result {
+  position: relative;
+  z-index: 3;
+  font-family: var(--font-display);
+  font-size: 48px;
+  line-height: 1;
+  color: var(--neon-green);
+  text-align: right;
+  text-shadow: var(--glow-green);
+  letter-spacing: 0.02em;
+  min-height: 52px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  overflow-wrap: anywhere;
+  transition: color var(--dur-med), text-shadow var(--dur-med);
+}
+
+/* Error state */
+.display-result.error {
+  color: var(--neon-mag);
+  text-shadow: var(--glow-mag);
+  font-size: 20px;
+  align-items: center;
+}
+
+/* ── Micro-interactions ── */
+
+/* Pop on result */
+.display-result.pop {
+  animation: result-pop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes result-pop {
+  0%   { transform: scale(0.88); opacity: 0.3; }
+  65%  { transform: scale(1.05); }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+/* Glitch flash on error */
+.display-result.glitch {
+  animation: glitch-flash 0.28s steps(3) both;
+}
+
+@keyframes glitch-flash {
+  0%   { clip-path: inset(0 0 92% 0); transform: translateX(-4px); }
+  20%  { clip-path: inset(35% 0 45% 0); transform: translateX(4px); }
+  40%  { clip-path: inset(75% 0 8%  0); transform: translateX(-2px); }
+  70%  { clip-path: inset(10% 0 75% 0); transform: translateX(2px); }
+  100% { clip-path: none; transform: none; }
+}
+
+/* ============================================================
+   Keypad grid
+   ============================================================ */
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+  padding: var(--space-md);
+}
+
+/* ============================================================
+   Base button
+   ============================================================ */
+.btn {
+  height: var(--btn-h);
+  border: 1px solid var(--void-border);
+  border-radius: var(--radius-md);
+  background: var(--void-panel);
+  color: #ccccdd;
+  font-family: var(--font-ui);
+  font-size: var(--btn-font);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    background   var(--dur-fast),
+    border-color var(--dur-fast),
+    color        var(--dur-fast),
+    box-shadow   var(--dur-fast),
+    transform    var(--dur-fast);
+  /* Tactile depth */
+  box-shadow: 0 4px 0 #00000088, inset 0 1px 0 #ffffff0e;
+}
+
+.btn:hover { background: #181d30; color: #ffffff; }
+
+/* Physical depress on press */
+.btn:active, .btn.pressed {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #00000066, inset 0 1px 0 #ffffff08;
+}
+
+/* Ripple shimmer */
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md);
+  background: radial-gradient(circle at center, #ffffff1e 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+.btn:active::after { opacity: 1; transition: opacity 0s; }
+
+/* Focus rings — visible, neon-colored */
+.btn:focus-visible {
+  outline: 2px solid var(--neon-green);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px #00ff8830, 0 4px 0 #00000088;
+}
+
+/* ── Numeric buttons ── */
+.btn-num {
+  color: var(--neon-amber);
+  border-color: #28200e;
+  background: linear-gradient(155deg, #191208 0%, #120d06 100%);
+  text-shadow: 0 0 6px #ffb34760;
+}
+.btn-num:hover {
+  background: linear-gradient(155deg, #221a0c 0%, #1a1208 100%);
+  border-color: #ffb34740;
+  box-shadow: 0 4px 0 #00000088, 0 0 10px #ffb34730, inset 0 1px 0 #ffffff0e;
+}
+.btn-num:focus-visible { outline-color: var(--neon-amber); box-shadow: 0 0 0 4px #ffb34730; }
+
+/* ── Operator buttons ── */
+.btn-op {
+  color: var(--neon-mag);
+  border-color: #28081a;
+  background: linear-gradient(155deg, #170810 0%, #0f060a 100%);
+  text-shadow: 0 0 6px #ff006e60;
+}
+.btn-op:hover {
+  background: linear-gradient(155deg, #220d18 0%, #180a10 100%);
+  border-color: #ff006e40;
+  box-shadow: 0 4px 0 #00000088, 0 0 10px #ff006e30, inset 0 1px 0 #ffffff0e;
+}
+.btn-op:focus-visible { outline-color: var(--neon-mag); box-shadow: 0 0 0 4px #ff006e30; }
+
+/* ── Function buttons (C, ⌫) ── */
+.btn-fn {
+  color: var(--neon-cyan);
+  border-color: #081828;
+  background: linear-gradient(155deg, #080e18 0%, #060b12 100%);
+  text-shadow: 0 0 6px #00d4ff50;
+  font-size: 16px;
+}
+.btn-fn:hover {
+  border-color: #00d4ff38;
+  box-shadow: 0 4px 0 #00000088, 0 0 10px #00d4ff28, inset 0 1px 0 #ffffff0e;
+}
+.btn-fn:focus-visible { outline-color: var(--neon-cyan); box-shadow: 0 0 0 4px #00d4ff30; }
+
+/* ── Equals button ── */
+.btn-eq {
+  color: #060810;
+  background: linear-gradient(155deg, #00ff88 0%, #00cc6e 100%);
+  border-color: #00ff88;
+  font-size: 28px;
+  text-shadow: none;
+  box-shadow: 0 4px 0 #004d2e, 0 0 18px #00ff8840, inset 0 1px 0 #ffffff28;
+}
+.btn-eq:hover {
+  background: linear-gradient(155deg, #20ffa0 0%, #00e67a 100%);
+  box-shadow: 0 4px 0 #004d2e, var(--glow-eq), inset 0 1px 0 #ffffff28;
+}
+.btn-eq:active, .btn-eq.pressed {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #004d2e, 0 0 8px #00ff8830;
+}
+.btn-eq:focus-visible {
+  outline-color: var(--neon-green);
+  box-shadow: 0 0 0 4px #00ff8858, var(--glow-eq);
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.calc-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-xs) var(--space-lg) var(--space-sm);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  border-top: 1px solid var(--void-border);
+  color: #ffffff18;
+}
+
+.status-label {
+  color: var(--neon-green);
+  text-shadow: var(--glow-green);
+  opacity: 0.65;
+  transition: color var(--dur-med), opacity var(--dur-med);
+}
+.status-label.error { color: var(--neon-mag); text-shadow: var(--glow-mag); opacity: 1; }
+
+.backend-label { color: #ffffff14; }
+
+#backend-status { transition: color var(--dur-med); }
+#backend-status.online  { color: var(--neon-green); }
+#backend-status.offline { color: var(--neon-mag); }
+
+/* ============================================================
+   Responsive — 320 px minimum
+   ============================================================ */
+@media (max-width: 390px) {
+  :root { --btn-h: 56px; --btn-font: 16px; }
+  .display-result     { font-size: 40px; }
+  .display-expression { font-size: 22px; }
+  .btn-eq             { font-size: 24px; }
+}
+
+@media (max-width: 340px) {
+  :root { --btn-h: 48px; --btn-font: 14px; --space-sm: 5px; }
+  .display-result     { font-size: 32px; }
+  .display-expression { font-size: 18px; }
+  .btn-eq             { font-size: 20px; }
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

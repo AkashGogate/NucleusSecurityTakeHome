@@ -5,7 +5,11 @@ const { test, expect } = require('@playwright/test');
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Click sequence of buttons by data-value or data-action. */
+/**
+ * Click sequence of buttons by data-value or data-action.
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} labels
+ */
 async function clickButtons(page, ...labels) {
   for (const label of labels) {
     const btn = page.locator(
@@ -15,12 +19,18 @@ async function clickButtons(page, ...labels) {
   }
 }
 
-/** Read the result display text. */
+/**
+ * Read the result display text.
+ * @param {import('@playwright/test').Page} page
+ */
 async function getResult(page) {
   return page.locator('#result').textContent();
 }
 
-/** Read the expression display text. */
+/**
+ * Read the expression display text.
+ * @param {import('@playwright/test').Page} page
+ */
 async function getExpr(page) {
   return page.locator('#expression').textContent();
 }
@@ -31,8 +41,16 @@ async function getExpr(page) {
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
-  // Wait for JS to load and backend ping to settle
-  await page.waitForFunction(() => typeof window.backendLive !== 'undefined', null, { timeout: 5000 }).catch(() => {});
+  // Wait for backend ping to settle — backendLive is a let (not on window),
+  // so poll the status element instead: it starts as '···' then flips to ONLINE/OFFLINE.
+  await page.waitForFunction(
+    () => {
+      const el = document.getElementById('backend-status');
+      return el && el.textContent !== '···';
+    },
+    null,
+    { timeout: 5000 }
+  ).catch(() => {});
   // Ensure clean state
   await page.locator('[data-action="clear"]').click();
 });
